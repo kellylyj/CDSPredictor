@@ -5,8 +5,8 @@ clc
 load('CDS.mat');
 
 weeklyData=[
-% struct('name','CACOM1J5','data',CACOM1J5_W);
-% struct('name','CBCI1E5','data',CBCI1E5_W);
+struct('name','CACOM1J5','data',CACOM1J5_W);
+struct('name','CBCI1E5','data',CBCI1E5_W);
 % struct('name','CBMW1E5','data',CBMW1E5_W);
 % struct('name','CBNP1E5','data',CBNP1E5_W);
 % struct('name','CBSH1E5','data',CBSH1E5_W);
@@ -37,12 +37,13 @@ weeklyData=[
 % struct('name','CTELP1J5','data',CTELP1J5_W);
 % struct('name','CTHYS1E5','data',CTHYS1E5_W);
 % struct('name','CVW1E5','data',CVW1E5_W);
-struct('name','CYAMA1J5','data',CYAMA1J5_W);   
+% struct('name','CYAMA1J5','data',CYAMA1J5_W);   
 ];
 N=1;
 testData=weeklyData;
 show=1;
 save=1;
+test=1.05;
 if save>0
     mkdir pics
 end
@@ -68,9 +69,33 @@ for k=1:size(testData,1)
 %             plot(datex, cdsx, '-b' , datex, cdsx_hat, '-r' , datex, cdsxP_hat, '-g', datex, cdsxE_hat, '-k')
 %             legend('CDS price',['CDS-ARn   (R^2=',num2str(Rx_Adjust,'%.3f'),')'],['CDS-SIRD (R^2=',num2str(RxP_Adjust,'%.3f'),')'],['CDS-MOBI (R^2=',num2str(RxE_Adjust,'%.3f'),')'])
             plot(datex, cdsx, '-b' , datex, cdsxP_hat, '-g','DatetimeTickFormat','yyyy/MM');
-            hold on
-            legend('CDS price',['CDS-Model2 (R^2=',num2str(RxP_Adjust,'%.3f'),')'])
+
+            if test > 0
+                hold on
+                bxP_t1=bxP;
+                bxP_t1(3) = bxP_t1(3)*(1/test);
+                [cdsxP_hat_t1, RxP_t1, RxP_Adjust_t1]=predictCDSLinear(cdsx,i,paramx(:,1:3),bxP_t1,1);
+    
+                bxP_t2=bxP;
+                bxP_t2(4) = bxP_t2(4)*(1/test);
+                [cdsxP_hat_t2, RxP_t2, RxP_Adjust_t2]=predictCDSLinear(cdsx,i,paramx(:,1:3),bxP_t2,1);
+    
+                bxP_t3=bxP;
+                bxP_t3(5) = bxP_t3(5)*(1/test);
+                [cdsxP_hat_t3, RxP_t3, RxP_Adjust_t3]=predictCDSLinear(cdsx,i,paramx(:,1:3),bxP_t3,1);            
+    
+                
+                plot(datex, cdsxP_hat_t1, '-m', datex, cdsxP_hat_t2, '-c', datex, cdsxP_hat_t3, '-k');
+                legend('CDS price',['CDS-Model2 (R^2=',num2str(RxP_Adjust,'%.3f'),')'], ...
+                        ['CDS-Model2 i*,',num2str(test)], ...
+                        ['CDS-Model2 r*',num2str(test)], ...
+                        ['CDS-Model2 d*',num2str(test)] ...
+                      )
+            else
+                legend('CDS price',['CDS-Model2 (R^2=',num2str(RxP_Adjust,'%.3f'),')'])
+            end
             title([name]);
+            hold off
             if save>0
                 saveas(gca,['./pics/Model2_',name,'.png']);
             end
