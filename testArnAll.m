@@ -7,43 +7,43 @@ load('CDS.mat');
 weeklyData=[
 struct('name','CACOM1J5','data',CACOM1J5_W);
 struct('name','CBCI1E5','data',CBCI1E5_W);
-% struct('name','CBMW1E5','data',CBMW1E5_W);
-% struct('name','CBNP1E5','data',CBNP1E5_W);
-% struct('name','CBSH1E5','data',CBSH1E5_W);
-% struct('name','CCITO1J5','data',CCITO1J5_W);
-% struct('name','CCJAP1J5','data',CCJAP1J5_W);
-% struct('name','CCNON1J5','data',CCNON1J5_W);
-% struct('name','CCONT1E5','data',CCONT1E5_W);
-% struct('name','CEDF1E5','data',CEDF1E5_W);
-% struct('name','CFTEL1E5','data',CFTEL1E5_W);
-% struct('name','CHEI1E5','data',CHEI1E5_W);
-% struct('name','CJFE1J5','data',CJFE1J5_W);
-% struct('name','CJPM1U5','data',CJPM1U5_W);
-% struct('name','CJTOB1J5','data',CJTOB1J5_W);
-% struct('name','CKNEL1J5','data',CKNEL1J5_W);
-% struct('name','CKOM1J5','data',CKOM1J5_W);
-% struct('name','CLUFT1E5','data',CLUFT1E5_W);
-% struct('name','CMAR1J5','data',CMAR1J5_W);
-% struct('name','CMSL1J5','data',CMSL1J5_W);
-% struct('name','CMTRO1E5','data',CMTRO1E5_W);
-% struct('name','CNEC1J5','data',CNEC1J5_W);
-% struct('name','CNIPY1J5','data',CNIPY1J5_W);
-% struct('name','CRWE1E5','data',CRWE1E5_W);
-% struct('name','CSIEM1E5','data',CSIEM1E5_W);
-% struct('name','CSNE1J5','data',CSNE1J5_W);
-% struct('name','CSOF1J5','data',CSOF1J5_W);
-% struct('name','CSUMI1J5','data',CSUMI1J5_W);
-% struct('name','CT370372','data',CT370372_W);
-% struct('name','CTELP1J5','data',CTELP1J5_W);
-% struct('name','CTHYS1E5','data',CTHYS1E5_W);
-% struct('name','CVW1E5','data',CVW1E5_W);
-% struct('name','CYAMA1J5','data',CYAMA1J5_W);   
+struct('name','CBMW1E5','data',CBMW1E5_W);
+struct('name','CBNP1E5','data',CBNP1E5_W);
+struct('name','CBSH1E5','data',CBSH1E5_W);
+struct('name','CCITO1J5','data',CCITO1J5_W);
+struct('name','CCJAP1J5','data',CCJAP1J5_W);
+struct('name','CCNON1J5','data',CCNON1J5_W);
+struct('name','CCONT1E5','data',CCONT1E5_W);
+struct('name','CEDF1E5','data',CEDF1E5_W);
+struct('name','CFTEL1E5','data',CFTEL1E5_W);
+struct('name','CHEI1E5','data',CHEI1E5_W);
+struct('name','CJFE1J5','data',CJFE1J5_W);
+struct('name','CJPM1U5','data',CJPM1U5_W);
+struct('name','CJTOB1J5','data',CJTOB1J5_W);
+struct('name','CKNEL1J5','data',CKNEL1J5_W);
+struct('name','CKOM1J5','data',CKOM1J5_W);
+struct('name','CLUFT1E5','data',CLUFT1E5_W);
+struct('name','CMAR1J5','data',CMAR1J5_W);
+struct('name','CMSL1J5','data',CMSL1J5_W);
+struct('name','CMTRO1E5','data',CMTRO1E5_W);
+struct('name','CNEC1J5','data',CNEC1J5_W);
+struct('name','CNIPY1J5','data',CNIPY1J5_W);
+struct('name','CRWE1E5','data',CRWE1E5_W);
+struct('name','CSIEM1E5','data',CSIEM1E5_W);
+struct('name','CSNE1J5','data',CSNE1J5_W);
+struct('name','CSOF1J5','data',CSOF1J5_W);
+struct('name','CSUMI1J5','data',CSUMI1J5_W);
+struct('name','CT370372','data',CT370372_W);
+struct('name','CTELP1J5','data',CTELP1J5_W);
+struct('name','CTHYS1E5','data',CTHYS1E5_W);
+struct('name','CVW1E5','data',CVW1E5_W);
+struct('name','CYAMA1J5','data',CYAMA1J5_W);   
 ];
 N=1;
 testData=weeklyData;
 show=1;
 save=1;
-test=1.05;
+test=0;
 if save>0
     mkdir pics
 end
@@ -55,6 +55,13 @@ for k=1:size(testData,1)
     result=struct('name',name);
     for i=1:N
         [date0, cds0]=convertCDSData(data);
+        indices = find(date0 > '2021-01-01');
+        date0 = date0(1:indices(1));
+        cds0 = cds0(1:indices(1));
+        
+%         date0 = date0(indices(1):end);
+%         cds0 = cds0(indices(1):end);
+
         [date1, S, I, R, D]=convertSIRDData(SIRD);
         [date2, RR, GP, PA, TS, WP, RE]=convertMobilityData(MOBILITY);
 %         [datex, cdsx, paramx]=combineData(date0, cds0, date1, [I,R,D]);
@@ -97,7 +104,11 @@ for k=1:size(testData,1)
             title([name]);
             hold off
             if save>0
-                saveas(gca,['./pics/Model2_',name,'.png']);
+                if test > 0
+                    saveas(gca,['./pics/Model2_',name,'_test.png']);
+                else
+                    saveas(gca,['./pics/Model2_',name,'.png']);
+                end
             end
             if show==0
                 close
