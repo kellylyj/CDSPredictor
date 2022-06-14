@@ -56,11 +56,11 @@ for k=1:size(testData,1)
     for i=1:N
         [date0, cds0]=convertCDSData(data);
         indices = find(date0 > '2021-01-01');
-        date0 = date0(1:indices(1));
-        cds0 = cds0(1:indices(1));
+%         date0 = date0(1:indices(1));
+%         cds0 = cds0(1:indices(1));
         
-%         date0 = date0(indices(1):end);
-%         cds0 = cds0(indices(1):end);
+        date0 = date0(indices(1):end);
+        cds0 = cds0(indices(1):end);
 
         [date1, S, I, R, D]=convertSIRDData(SIRD);
         [date2, RR, GP, PA, TS, WP, RE]=convertMobilityData(MOBILITY);
@@ -68,8 +68,8 @@ for k=1:size(testData,1)
         [datex, cdsx, paramx]=combineData2(date0, cds0, date1, [I,R,D], date2, [RR, GP, PA, TS, WP, RE]);
         
         [bx,cdsx_hat,Rx,Rx_Adjust]=myArn(cdsx,i,1);
-        [bxP,cdsxP_hat,RxP,RxP_Adjust]=myArnParams(cdsx,i,paramx(:,1:3),1);
-        [bxE,cdsxE_hat,RxE,RxE_Adjust]=myArnParams(cdsx,i, paramx,1);
+        [bxP,cdsxP_hat,RxP,RxP_Adjust,tValx,pValx]=myArnParams(cdsx,i,paramx(:,1:3),1);
+        [bxE,cdsxE_hat,RxE,RxE_Adjust,tValE,pValE]=myArnParams(cdsx,i, paramx,1);
 
         if save>0 || show>0
             figure;
@@ -114,7 +114,24 @@ for k=1:size(testData,1)
                 close
             end
         end
-        fprintf('%10s, %.2f, %.2f, %.2f, %.2f, %.2f, %.2f\n', name, RxP_Adjust, bxP(1), bxP(2), bxP(3), bxP(4), bxP(5));
+
+        start=['   ';'   ';'   ';'   ';'   '];
+        for i=1:length(start)
+            if (pValx(i)<=0.001)
+                start(i,:)='***';
+            elseif (pValx(i)<=0.01)
+                start(i,:)='** ';
+            elseif (pValx(i)<=0.05)
+                start(i,:)='*  ';
+            end
+        end
+        fprintf('%10s, %.2f, %10.2f%s (%8.5f,%6.5f), %10.2f%s (%8.5f,%6.5f), %10.2f%s (%8.5f,%6.5f), %10.2f%s (%8.5f,%6.5f), %10.2f%s (%8.5f,%6.5f)\n', ...
+                 name, RxP_Adjust,...
+                 bxP(1), start(1,:), tValx(1), pValx(1), ...
+                 bxP(2), start(2,:), tValx(2), pValx(2), ...
+                 bxP(3), start(3,:), tValx(3), pValx(3), ...
+                 bxP(4), start(4,:), tValx(4), pValx(4), ...
+                 bxP(5), start(5,:), tValx(5), pValx(5));
 
 
         
