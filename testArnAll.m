@@ -68,14 +68,22 @@ for k=1:size(testData,1)
         [datex, cdsx, paramx]=combineData2(date0, cds0, date1, [I,R,D], date2, [RR, GP, PA, TS, WP, RE]);
         
         [bx,cdsx_hat,Rx,Rx_Adjust]=myArn(cdsx,i,1);
-        [bxP,cdsxP_hat,RxP,RxP_Adjust,tValx,pValx]=myArnParams(cdsx,i,paramx(:,1:3),1);
-        [bxE,cdsxE_hat,RxE,RxE_Adjust,tValE,pValE]=myArnParams(cdsx,i, paramx,1);
+        [bxP,cdsxP_hat,RxP,RxP_Adjust,tValx,pValx,aicX,bicX]=myArnParams(cdsx,i,paramx(:,1:3),1);
+        [bxE,cdsxE_hat,RxE,RxE_Adjust,tValE,pValE,aicE,bicE]=myArnParams(cdsx,i, paramx,1);
 
         if save>0 || show>0
             figure;
 %             plot(datex, cdsx, '-b' , datex, cdsx_hat, '-r' , datex, cdsxP_hat, '-g', datex, cdsxE_hat, '-k')
 %             legend('CDS price',['CDS-ARn   (R^2=',num2str(Rx_Adjust,'%.3f'),')'],['CDS-SIRD (R^2=',num2str(RxP_Adjust,'%.3f'),')'],['CDS-MOBI (R^2=',num2str(RxE_Adjust,'%.3f'),')'])
+            
+%             plot(datex, cdsx, '-b', datex, cdsxP_hat, '-g', datex, cdsxE_hat, '-k')
+%             legend('CDS price',['CDS-Model2 (R^2=',num2str(RxP_Adjust,'%.3f'),')'],['CDS-Model3 (R^2=',num2str(RxE_Adjust,'%.3f'),')'])
+
             plot(datex, cdsx, '-b' , datex, cdsxP_hat, '-g','DatetimeTickFormat','yyyy/MM');
+            legend('CDS price',['CDS-Model2 (R^2=',num2str(RxP_Adjust,'%.3f'),')'])
+            
+%             plot(datex, cdsx, '-b' , datex, cdsxE_hat, '-g','DatetimeTickFormat','yyyy/MM');
+%             legend('CDS price',['CDS-Model3 (R^2=',num2str(RxE_Adjust,'%.3f'),')'])
 
             if test > 0
                 hold on
@@ -99,7 +107,7 @@ for k=1:size(testData,1)
                         ['CDS-Model2 d*',num2str(test)] ...
                       )
             else
-                legend('CDS price',['CDS-Model2 (R^2=',num2str(RxP_Adjust,'%.3f'),')'])
+%                 legend('CDS price',['CDS-Model2 (R^2=',num2str(RxP_Adjust,'%.3f'),')'])
             end
             title([name]);
             hold off
@@ -127,8 +135,8 @@ for k=1:size(testData,1)
                 startX(i,:)='   ';
             end
         end
-        fprintf('sird:%10s, %.2f, %10.2f%s (%8.5f,%6.5f), %10.2f%s (%8.5f,%6.5f), %10.2f%s (%8.5f,%6.5f), %10.2f%s (%8.5f,%6.5f), %10.2f%s (%8.5f,%6.5f)\n', ...
-                 name, RxP_Adjust,...
+        fprintf('sird:%10s, %.2f, aic:%6.2f, bic:%6.2f, %10.2f%s (%8.5f,%6.5f), %10.2f%s (%8.5f,%6.5f), %10.2f%s (%8.5f,%6.5f), %10.2f%s (%8.5f,%6.5f), %10.2f%s (%8.5f,%6.5f)\n', ...
+                 name, RxP_Adjust, aicX, bicX, ...
                  bxP(1), startX(1,:), tValx(1), pValx(1), ...
                  bxP(2), startX(2,:), tValx(2), pValx(2), ...
                  bxP(3), startX(3,:), tValx(3), pValx(3), ...
@@ -147,8 +155,8 @@ for k=1:size(testData,1)
                 startE(i,:)='   ';
             end
         end
-         fprintf('mobi:%10s, %.2f, %10.2f%s (%8.5f,%6.5f), %10.2f%s (%8.5f,%6.5f), %10.2f%s (%8.5f,%6.5f), %10.2f%s (%8.5f,%6.5f), %10.2f%s (%8.5f,%6.5f), %10.2f%s (%8.5f,%6.5f), %10.2f%s (%8.5f,%6.5f), %10.2f%s (%8.5f,%6.5f), %10.2f%s (%8.5f,%6.5f), %10.2f%s (%8.5f,%6.5f), %10.2f%s (%8.5f,%6.5f)\n', ...
-                  name, RxE_Adjust,...
+         fprintf('mobi:%10s, %.2f, aic:%6.2f, bic:%6.2f, %10.2f%s (%8.5f,%6.5f), %10.2f%s (%8.5f,%6.5f), %10.2f%s (%8.5f,%6.5f), %10.2f%s (%8.5f,%6.5f), %10.2f%s (%8.5f,%6.5f), %10.2f%s (%8.5f,%6.5f), %10.2f%s (%8.5f,%6.5f), %10.2f%s (%8.5f,%6.5f), %10.2f%s (%8.5f,%6.5f), %10.2f%s (%8.5f,%6.5f), %10.2f%s (%8.5f,%6.5f)\n', ...
+                  name, RxE_Adjust, aicE, bicE, ...
                   bxE(1), startE(1,:), tValE(1), pValE(1), ...
                   bxE(2), startE(2,:), tValE(2), pValE(2), ...
                   bxE(3), startE(3,:), tValE(3), pValE(3), ...

@@ -1,4 +1,4 @@
-function [ b, t_hat, R2, R2_adjust, tval, pval ] = myArnParams( t,n,params,predict)
+function [ b, t_hat, R2, R2_adjust, tval, pval, aic, bic ] = myArnParams( t,n,params,predict)
 tn = t(n+1:end);
 len = size(tn,1);
 T = ones(len,n+1);
@@ -34,7 +34,7 @@ abs(tn_hat-tn);
 % ((tn-tn_mean)'*(tn-tn_mean))
 % R2=((tn_hat-tn_mean)'*(tn_hat-tn_mean))./((tn-tn_mean)'*(tn-tn_mean));
 R2=1-((tn-tn_hat)'*(tn-tn_hat))./((tn-tn_mean)'*(tn-tn_mean));
-R2_adjust=1-(1-R2)*(length(tn_hat)-1)./(length(tn_hat)-length(b)-1);
+R2_adjust=1-(1-R2)*(length(tn_hat)-1)./(length(tn_hat)-length(b));
 
 tval=zeros(size(b));
 pval=zeros(size(b));
@@ -43,6 +43,9 @@ for i=1:length(b)
     tval(i)=b(i)/sqrt(err/(length(tn_hat)-length(b))*S(i,i));
     pval(i)=(1-tcdf(abs(tval(i)),length(tn_hat)-length(b)))*2;
 end
+
+aic=length(tn)*log(err/length(tn))+2*length(b);
+bic=length(tn)*log(err/length(tn))+log(length(tn))*length(b);
 
 
 end
