@@ -135,7 +135,7 @@ for k=1:size(testData,1)
     else
         params=[beta,mu,r,delta,XT,T];
     end
-    [paramsP,cdsP,errP, cdsP_R2, cdsP_Adjust]=myDescend(sird,index,cdsx,params,steps,STEP,TIMES);
+    [paramsP,cdsP,errP, cdsP_R2, cdsP_Adjust, aic, bic]=myDescend(sird,index,cdsx,params,steps,STEP,TIMES);
     dateR=datex(index);
     cdsR=cdsx(index);
     fprintf('testResult k=%d, name=%s, finish!!!\n',k,name);

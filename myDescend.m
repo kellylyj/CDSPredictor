@@ -1,8 +1,10 @@
-function [ paramsP, cdsP, err, R2, R2_adjust ] = myDescend(sird, index, cds, params, steps, STEP, TIMES)
+function [ paramsP, cdsP, err, R2, R2_adjust, aic, bic ] = myDescend(sird, index, cds, params, steps, STEP, TIMES)
 cdsP=myCDS(sird,index,params);
 cdxR=cds(index);
 error=cdxR-cdsP;
 err=error'*error;
+aic=length(cdxR)*log(err/length(cdxR))+2*length(params);
+bic=length(cdxR)*log(err/length(cdxR))+log(length(cdxR))*length(params);
 
 paramsP=params;
 
@@ -21,14 +23,16 @@ for i=1:TIMES
                paramsP(k)=paramsPP(k);
                cdsP=cdsPP;
                err=errPP;
+               aic=length(cdxR)*log(err/length(cdxR))+2*length(params);
+               bic=length(cdxR)*log(err/length(cdxR))+log(length(cdxR))*length(params);
             end
         end    
     end
     if (lastErr-err)<1e-6
        steps_index=find(stepsP>0.001);
        if length(steps_index) == 0
-       fprintf('myDescend breakng, time=%d, lastErr=%f, err=%f, ''err'',%f,''beta'',[%.4f,%.4f,%.4f,%.4f],''mu'',[%.4f,%.4f,%.4f,%.4f],''r'',%.3f,''delta'',%.3f,''XT'',%.3f,''T'',%d\n', ...
-               i,lastErr,err,err,...
+       fprintf('myDescend breakng, time=%d, lastErr=%f, err=%f, aic=%f, bic=%f, ''err'',%f,''beta'',[%.4f,%.4f,%.4f,%.4f],''mu'',[%.4f,%.4f,%.4f,%.4f],''r'',%.3f,''delta'',%.3f,''XT'',%.3f,''T'',%d\n', ...
+               i,lastErr,err,aic,bic,err,...
                paramsP(1),paramsP(2),paramsP(3),paramsP(4),paramsP(5),paramsP(6),...
                paramsP(7),paramsP(8),paramsP(9),paramsP(10),paramsP(11),paramsP(12));
            break;
@@ -43,8 +47,8 @@ for i=1:TIMES
        cdsT=myCDS(sird,index,paramsP);
        errorT=cdxR-cdsT;
        errT=errorT'*errorT;
-       fprintf('myDescend running, time=%d, lastErr=%f, err=%f, ''err'',%f,''beta'',[%.4f,%.4f,%.4f,%.4f],''mu'',[%.4f,%.4f,%.4f,%.4f],''r'',%.3f,''delta'',%.3f,''XT'',%.3f,''T'',%d\n', ...
-               i,lastErr,err,errT,...
+       fprintf('myDescend running, time=%d, lastErr=%f, err=%f, aic=%f, bic=%f, ''err'',%f,''beta'',[%.4f,%.4f,%.4f,%.4f],''mu'',[%.4f,%.4f,%.4f,%.4f],''r'',%.3f,''delta'',%.3f,''XT'',%.3f,''T'',%d\n', ...
+               i,lastErr,err,aic,bic,errT,...
                paramsP(1),paramsP(2),paramsP(3),paramsP(4),paramsP(5),paramsP(6),...
                paramsP(7),paramsP(8),paramsP(9),paramsP(10),paramsP(11),paramsP(12));
     end
@@ -78,3 +82,5 @@ end
 cdxR_mean=mean(cdxR);
 R2=1-((cdxR-cdsP)'*(cdxR-cdsP))./((cdxR-cdxR_mean)'*(cdxR-cdxR_mean));
 R2_adjust=1-(1-R2)*(length(cdsP)-1)./(length(cdsP)-length(paramsP)-1);
+
+

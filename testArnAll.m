@@ -42,7 +42,7 @@ struct('name','CYAMA1J5','data',CYAMA1J5_W);
 N=1;
 testData=weeklyData;
 show=1;
-save=1;
+save=0;
 test=0;
 if save>0
     mkdir pics
@@ -59,16 +59,16 @@ for k=1:size(testData,1)
         date0 = date0(1:indices(1));
         cds0 = cds0(1:indices(1));
         
-%        date0 = date0(indices(1):end);
-%        cds0 = cds0(indices(1):end);
+ %       date0 = date0(indices(1):end);
+ %       cds0 = cds0(indices(1):end);
 
         [date1, S, I, R, D]=convertSIRDData(SIRD);
         [date2, RR, GP, PA, TS, WP, RE]=convertMobilityData(MOBILITY);
 %         [datex, cdsx, paramx]=combineData(date0, cds0, date1, [I,R,D]);
         [datex, cdsx, paramx]=combineData2(date0, cds0, date1, [I,R,D], date2, [RR, GP, PA, TS, WP, RE]);
         
-        [bx,cdsx_hat,Rx,Rx_Adjust]=myArn(cdsx,i,1);
-        [bxP,cdsxP_hat,RxP,RxP_Adjust,tValx,pValx,aicX,bicX]=myArnParams(cdsx,i,paramx(:,1:3),1);
+        [bx,cdsx_hat,Rx,Rx_Adjust,tVal,pVal,aic,bic]=myArn(cdsx,i,1);
+        [bxP,cdsxP_hat,RxP,RxP_Adjust,tValP,pValP,aicP,bicP]=myArnParams(cdsx,i,paramx(:,1:3),1);
         [bxE,cdsxE_hat,RxE,RxE_Adjust,tValE,pValE,aicE,bicE]=myArnParams(cdsx,i, paramx,1);
 
         if save>0 || show>0
@@ -79,11 +79,11 @@ for k=1:size(testData,1)
 %             plot(datex, cdsx, '-b', datex, cdsxP_hat, '-g', datex, cdsxE_hat, '-k')
 %             legend('CDS price',['CDS-Model2 (R^2=',num2str(RxP_Adjust,'%.3f'),')'],['CDS-Model3 (R^2=',num2str(RxE_Adjust,'%.3f'),')'])
 
-            plot(datex, cdsx, '-b' , datex, cdsxP_hat, '-g','DatetimeTickFormat','yyyy/MM');
-            legend('CDS price',['CDS-Model2 (R^2=',num2str(RxP_Adjust,'%.3f'),')'])
+%            plot(datex, cdsx, '-b' , datex, cdsxP_hat, '-g','DatetimeTickFormat','yyyy/MM');
+%            legend('CDS price',['CDS-Model2 (R^2=',num2str(RxP_Adjust,'%.3f'),')'])
             
-%             plot(datex, cdsx, '-b' , datex, cdsxE_hat, '-g','DatetimeTickFormat','yyyy/MM');
-%             legend('CDS price',['CDS-Model3 (R^2=',num2str(RxE_Adjust,'%.3f'),')'])
+             plot(datex, cdsx, '-b' , datex, cdsxE_hat, '-g','DatetimeTickFormat','yyyy/MM');
+             legend('CDS price',['CDS-Model3 (R^2=',num2str(RxE_Adjust,'%.3f'),')'])
 
             if test > 0
                 hold on
@@ -123,25 +123,25 @@ for k=1:size(testData,1)
             end
         end
 
-        startX=[];
-        for i=1:length(pValx)
-            if (pValx(i)<=0.001)
-                startX(i,:)='***';
-            elseif (pValx(i)<=0.01)
-                startX(i,:)='** ';
-            elseif (pValx(i)<=0.05)
-                startX(i,:)='*  ';
+        startP=[];
+        for i=1:length(pValP)
+            if (pValP(i)<=0.001)
+                startP(i,:)='***';
+            elseif (pValP(i)<=0.01)
+                startP(i,:)='** ';
+            elseif (pValP(i)<=0.05)
+                startP(i,:)='*  ';
             else
-                startX(i,:)='   ';
+                startP(i,:)='   ';
             end
         end
         fprintf('sird:%10s, %.2f, aic:%6.2f, bic:%6.2f, %10.2f%s (%8.5f,%6.5f), %10.2f%s (%8.5f,%6.5f), %10.2f%s (%8.5f,%6.5f), %10.2f%s (%8.5f,%6.5f), %10.2f%s (%8.5f,%6.5f)\n', ...
-                 name, RxP_Adjust, aicX, bicX, ...
-                 bxP(1), startX(1,:), tValx(1), pValx(1), ...
-                 bxP(2), startX(2,:), tValx(2), pValx(2), ...
-                 bxP(3), startX(3,:), tValx(3), pValx(3), ...
-                 bxP(4), startX(4,:), tValx(4), pValx(4), ...
-                 bxP(5), startX(5,:), tValx(5), pValx(5));
+                 name, RxP_Adjust, aicP, bicP, ...
+                 bxP(1), startP(1,:), tValP(1), pValP(1), ...
+                 bxP(2), startP(2,:), tValP(2), pValP(2), ...
+                 bxP(3), startP(3,:), tValP(3), pValP(3), ...
+                 bxP(4), startP(4,:), tValP(4), pValP(4), ...
+                 bxP(5), startP(5,:), tValP(5), pValP(5));
 
         startE=[];
         for i=1:length(pValE)
