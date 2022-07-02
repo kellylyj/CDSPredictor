@@ -11,11 +11,30 @@ b=S*(T'*tn);
 t_hat=t;
 
 if predict > 0
-    for i=n+1:length(t_hat)
-        t_his = [1;t_hat(i-n:i-1)]';
-        t_hat(i)=t_his*b;
+    t_hat_best = t_hat;
+    err_best=realmax;
+    kk=linspace(min(t_hat),max(t_hat),100);
+    tt=zeros(length(kk)^n, n);
+    for k=1:n
+        num=length(kk)^(n-k);
+        times=size(tt,1)/num;
+        for p=1:times
+            tt((p-1)*num+1:p*num,k)=kk(mod(p-1,length(kk))+1);
+        end
     end
-    tn_hat=t_hat(n+1:end);
+    for ti=1:length(tt)
+        t_hat(1:n)=tt(ti);
+        for i=n+1:length(t_hat)
+            t_his = [1;t_hat(i-n:i-1)]';
+            t_hat(i)=t_his*b;
+        end
+        err=(t_hat(n+1:end)-tn)'*(t_hat(n+1:end)-tn);
+        if(err<err_best)
+            err=err_best;
+            t_hat_best=t_hat;
+        end
+    end
+    tn_hat=t_hat_best(n+1:end);
 else
     tn_hat=T*b;  
     t_hat(n+1:end)=tn_hat;
